@@ -1,0 +1,126 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "User Box Demo Service"
+  contact:
+    email: "b@b.com"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+host: "localhost"
+basePath: "/"
+tags:
+- name: "Users"
+  description: "Your UserBox"
+schemes:
+- "http"
+paths:
+  /Users:
+    get:
+      tags:
+      - "Users"
+      summary: "Get all Users from the box"
+      operationId: "getAllUsers"
+      security:
+      - oauth2: [global]
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "list of all Users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+    post:
+      tags:
+      - "Users"
+      summary: "Add a new User to the box"
+      operationId: "addNewUser"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added to the box"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            title:
+              type: "string"
+            author:
+              type: "string"
+      security:
+      - oauth2: [global]
+      consumes:
+      - "application/json"
+      responses:
+        201:
+          description: "User was created"
+        400:
+          description: "User object format mismatch"
+  /Users/{UserId}:
+    get:
+      tags:
+      - "Users"
+      summary: "Get User by id"
+      operationId: "getUserById"
+      parameters:
+      - name: "UserId"
+        in: "path"
+        description: "ID of the User to return"
+        required: true
+        type: "integer"
+        format: "int32"
+      security:
+      - oauth2: [global]
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "User not found"
+    delete:
+      tags:
+      - "Users"
+      summary: "Delete User by id"
+      operationId: "deleteUserById"
+      parameters:
+      - name: "UserId"
+        in: "path"
+        description: "ID of the User to delete"
+        required: true
+        type: "integer"
+        format: "int32"
+      security:
+      - oauth2: [global]
+      responses:
+        204:
+          description: "User has been successfully removed from box"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "User not found"
+securityDefinitions:
+  oauth2:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8083/auth/realms/Tidsbanken/protocol/openid-connect/auth"
+    tokenUrl: "http://localhost:8083/auth/realms/Tidsbanken/protocol/openid-connect/token"
+    flow: "accessCode"
+    scopes:
+      global: "global"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      title:
+        type: "string"
+      author:
+        type: "string"
